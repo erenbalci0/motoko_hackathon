@@ -30,26 +30,19 @@ actor LicenseControl {
     }
   };
 
-  // Lisanslı ürün kontrolü yapan fonksiyon
-  public func checkLicense(serialNumber: SerialNumber) : async Text {
-    // List.find'i düzgün kullanmak için tip uyumunu sağlıyoruz
-    let result = List.find(licensedProducts, func (product : SerialNumber) : Bool { 
-      product == serialNumber
-    });
-    switch result {
-      case (?_) {
-        return "Geçerli lisans: " # serialNumber;
-      };
-      case (_) {
-        return "Geçersiz lisans: " # serialNumber;
-      };
-    }
-  };
+   public func checkLicense(serialNumber: SerialNumber) : async ?Text {
+  if (List.some<SerialNumber>(licensedProducts, func (product : SerialNumber) : Bool { product == serialNumber })) {
+    ?("Lisans bulundu")
+  } else {
+    null
+  }
+};
+
 
   // Lisanslı ürün eklemek için bir fonksiyon
   public func addLicensedProduct(serialNumber: SerialNumber) : async Text {
     // List.append kullanarak yeni ürünü listeye ekliyoruz
-    licensedProducts := List.append(licensedProducts, List.nil());  // Bu satırda append doğru kullanılmıştır.
+    licensedProducts := List.append(licensedProducts, List.push(serialNumber, List.nil()));
     return "Lisanslı ürün eklendi: " # serialNumber;
   };
 
